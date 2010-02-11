@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * Implementation of hook_user().
+ */
+ 
+function domain_member_link_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'view':
+        $account->content['domain'] = array(
+          '#type' => 'user_profile_category',
+          '#weight' => 10,
+          '#title' => t('Assigned domains:'),
+        );
+        if (empty($account->domain_user)) {
+          $output = t('This user is not assigned to a domain.');
+        }
+        else {
+          $output = '<ul>';
+          foreach ($account->domain_user as $id) {
+            if (abs($id) > 0) {
+              if ($id > 0) {
+                $domain = domain_lookup($id);
+                $output .= '<li>'. l($domain['sitename'],'http://'.$domain['subdomain']) .'</li>';
+              }
+              else {
+                $output .= '<li>'. variable_get('domain_sitename', variable_get('site_name', 'Drupal')) .'</li>';
+              }
+            }
+          }
+          $output .= '</ul>';
+        }
+        $account->content['domain']['domain_settings'] = array(
+          '#type' => 'user_profile_item',
+          '#value' => $output,
+        );
+        break;   
+  }
+}
+
