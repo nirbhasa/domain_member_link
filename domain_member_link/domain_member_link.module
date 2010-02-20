@@ -1,12 +1,27 @@
 <?php
 
 /**
+ * Implementation of hook_perm().
+ */
+function domain_member_link_perm() {
+  $perms = array('view own assigned domains',
+    'view all users assigned domains',
+  );
+  return $perms;
+}
+
+/**
  * Implementation of hook_user().
  */
  
 function domain_member_link_user($op, &$edit, &$account, $category = NULL) {
+  
+  global $user;
   switch ($op) {
     case 'view':
+      if (user_access('view all users assigned domains') 
+        || (user_access('view own assigned domains') && ($account->uid == $user->uid))) {
+          
         $account->content['domain'] = array(
           '#type' => 'user_profile_category',
           '#weight' => 10,
@@ -21,7 +36,7 @@ function domain_member_link_user($op, &$edit, &$account, $category = NULL) {
             if (abs($id) > 0) {
               if ($id > 0) {
                 $domain = domain_lookup($id);
-                $output .= '<li>'. l($domain['sitename'],'http://'.$domain['subdomain']) .'</li>';
+                $output .= '<li>'. l($domain['sitename'], 'http://'.$domain['subdomain']) .'</li>';
               }
               else {
                 $output .= '<li>'. variable_get('domain_sitename', variable_get('site_name', 'Drupal')) .'</li>';
@@ -34,7 +49,8 @@ function domain_member_link_user($op, &$edit, &$account, $category = NULL) {
           '#type' => 'user_profile_item',
           '#value' => $output,
         );
-        break;   
+      }  
+      break;   
   }
 }
 

@@ -2,7 +2,7 @@
 name = Domain Member Link
 description = Generates link in user page to members' assigned domains.
 package = Domain Access
-version = 6.x-0.4
+version = 6.x-1.0
 core = 6.x
 dependencies[] = domain
 
